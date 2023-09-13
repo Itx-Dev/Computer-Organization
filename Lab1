@@ -1,0 +1,60 @@
+## Devin Reichenbach
+## CMPE22-2 12PM-2:50PM MW
+## Add numbers from 1 to N and return resultant sum to user.
+
+		.data
+Prompt:	.asciiz		"\n Please input a value for N = "
+Bye:		.asciiz		"\n*** Have a nice day ***"
+Result:		.asciiz		"The sum of the integers from 1 to N is "
+
+		.text
+main:
+	
+		## Ask user for input
+		li  $v0, 4							#  Load print_string sys code into $v0
+		la $a0, Prompt						# Load $a0 with prompt message
+		syscall
+	
+		## Get value for N
+		li $v0, 5							# Load read_int sys code into $v0
+		syscall								# Look for user input
+		move $v1, $v0						# Move value given by user (in $v0) into register $v1
+    		
+    		## Run algorithm if $v1 is greater than zero
+    		if:
+    			bltz  $v1, done					# Branch to done label if $v1 is less than zero
+    			li $t0, 0							# Load $t0 with 0
+    	
+    		## Run loop while $v1 is greater than zero
+		while:						
+			bltz  $v1, exit					# Branch to exit label if $v1 is less than zero
+      
+			add $t0, $t0, $v1				# $t0 = $t0 + $v1
+			addi $v1, $v1, -1				# $v1 = $v1 - 1
+      
+			j while							# Jump back to beginning of while loop to check statement
+    
+    		# Exit while loop
+		exit:								# branch here if v0 is less than or equal to 0
+	
+			li $v0, 4						# load print_string sys code into $v0
+			la $a0, Result					# load Result message into $a0
+			syscall							# print Result message
+		
+			move $a0, $t0					# Move result value into $a0 to be displayed
+			li $v0, 1						# Load $v0 with print_int sys code
+			syscall							# Print resultant integer from algorithm
+		
+			j if								# Jump to if to check condition
+			
+		## Exit if statement
+		done: 								# Branch here if $v1 is less than or equal to zero
+	
+			li	$v0, 4						# Load print_string sys code
+			la	$a0, Bye					# Load Bye message into a0
+			syscall							# Print Bye message
+			
+			li $v0, 10						# Load $v0 with sys code 10 for exit
+			syscall							# Exit program
+    
+    
