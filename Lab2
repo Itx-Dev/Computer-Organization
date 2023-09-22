@@ -1,0 +1,86 @@
+## Devin Reichenbach
+## CMPE220-2 12PM-2:50PM
+## Add even integers between given X and Y by user and return sum
+
+.data
+XandYPrompt:	.asciiz		"Please enter values for X and Y\n"
+SumPrompt:	.asciiz		"The sum of the even integers between X and Y is: "
+ErrorPrompt:	.asciiz		"Try Again! X needs to be smaller than Y.\n"
+
+.text
+main:
+
+InputPrompt:
+# Prompt User for input
+li $v0, 4
+la $a0, XandYPrompt
+syscall
+
+# Receive input from user for X value
+li $v0, 5
+syscall
+
+# Store X Value into $s0 register
+move $s0, $v0
+
+# Receive second input from user for Y value
+li $v0, 5
+syscall
+
+# Store Y value into $s1 register
+move $s1, $v0
+
+ble $s0, $s1 algorithm	# Branch to algorithm if x > y
+li $v0, 4		# Load print_string into $v0
+la $a0, ErrorPrompt	# Print ErrorPrompt to user
+syscall
+
+b InputPrompt		# Retry Entry
+
+algorithm:
+# Check if x is even or odd
+addi $t0, $zero, 2	# set $t0 = 2
+div $t0, $s0, $t0	# $t0 = x / 2 
+mfhi $s6			# $s6 = remainder
+
+# Check if y is even or odd
+addi $t0, $zero, 2	# set $t0 = 2
+div $t0, $s1, $t0	# t0 = y / 2
+mfhi $s7			# $s7 = remainder
+
+# Branch if $s3 is equal to zero
+beqz $s6, checkYEven	# if remainder = zero; branch to check y
+addi $s0, $s0, 1		# else x = x + 1 (to make x even)
+
+# If Y is odd subtract by 1
+checkYEven:
+beqz $s7, while		# if remainder = zero; branch to while loop
+addi $s1, $s1, -1	# else y = y - 1
+
+while:
+bgt $s0, $s1, end	# branch if (x > y) 
+add $s3, $s0, $s3 	# sum = sum + x
+addi $s0, $s0, 2  	# x = x + 2
+b while			# branch back to beginning of while
+
+
+end:
+# Print Sum prompt to user
+li $v0, 4		# load sys call print_string into $v0
+la $a0, SumPrompt	# load SumPrompt string into $a0
+syscall			# print string
+
+li $v0, 1		# load sys call print_int into $v0
+la $a0, ($s3) 		# load sum value into $0
+syscall			# print int
+
+
+
+li $v0, 10		# load sys call exit into $v0
+syscall			# exit program
+
+
+
+
+
+
